@@ -12,16 +12,22 @@ services:
     env_file:
       - .env
     environment:
-      MYSQL_HOST: db
+      DB_HOST: web 
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
-db:
-  image: mysql:8
-  networks:
+  db:
+    image: mysql:8
+    networks:
       backend:
         ipv4_address: 172.20.0.10
+        aliases:
+          - web
     env_file:
       - .env
     environment:
@@ -32,10 +38,11 @@ db:
     restart: always
     volumes:
       - mysql_data:/var/lib/mysql
-
-networks:
-  backend:
-    external: true
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      timeout: 20s
+      retries: 10
+      start_period: 40s
 
 volumes:
   mysql_data:

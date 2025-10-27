@@ -1,0 +1,9 @@
+.env
+.git/
+Dockerfile
+Dockerfile.python
+LICENSE
+README.md
+compose.yaml
+proxy.yaml
+schema.pdf
